@@ -1,0 +1,25 @@
+name: probe-portal
+
+# One-off test: can GitHub's servers download the Milwaukee crime files?
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Download both files and report size and first lines
+        run: |
+          UA="Mozilla/5.0 (portfolio project; github.com/zaidatom585)"
+          for f in \
+            "wibr.csv https://data.milwaukee.gov/dataset/e5feaad3-ee73-418c-b65d-ef810c199390/resource/87843297-a6fa-46d4-ba5d-cb342fb2d3bb/download/wibr.csv" \
+            "wibrarchive.csv https://data.milwaukee.gov/dataset/5a537f5c-10d7-40a2-9b93-3527a4c89fbd/resource/395db729-a30a-4e53-ab66-faeb5e1899c8/download/wibrarchive.csv"; do
+            set -- $f
+            echo "=== $1"
+            code=$(curl -sS -L -A "$UA" -o "$1" -w "%{http_code}" --max-time 600 "$2" || echo "curl-failed")
+            echo "HTTP status: $code"
+            ls -lh "$1" 2>/dev/null || true
+            head -c 300 "$1" 2>/dev/null; echo
+            echo "rows: $(wc -l < "$1" 2>/dev/null || echo 0)"
+          done

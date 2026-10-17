@@ -1,0 +1,17 @@
+# raw and working data stay local (re-downloadable from the city portal)
+data/
+*.csv
+*.duckdb
+*.duckdb.wal
+.venv/
+__pycache__/
+*.pyc
+target/
+dbt_packages/
+logs/
+*.txt
+.env
+
+.vscode/
+databricks.yml
+.databricks/
